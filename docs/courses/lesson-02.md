@@ -75,6 +75,8 @@ checker.Stop() // idempotent, safe to call multiple times
 
 Cancelling the context also stops the checker.
 
-## Summary
+## Practice Exercise
 
-Health checkers provide continuous monitoring of infrastructure dependencies. They surface status transitions through logging and expose queryable state for dashboards and readiness probes.
+1. Create a health checker for a mock database that alternates between healthy and unhealthy every 2 checks. Set the interval to 100ms. After 1 second, verify `Status()` reflects the current state.
+2. Set a logger and verify log messages include "Health check failed" on failure and "Health check recovered" on recovery transitions.
+3. Test graceful shutdown: start a checker, cancel its context, and verify the checker stops polling. Call `Stop()` again to verify idempotency.

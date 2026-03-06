@@ -87,6 +87,8 @@ res.Stop()
 
 This cancels the internal context (stopping all health checker goroutines) and explicitly calls `Stop()` on each checker.
 
-## Summary
+## Practice Exercise
 
-The Resilience facade simplifies fault tolerance by providing a single API for circuit breakers and health checks. Use `Stats()` to expose system health and `Stop()` for clean shutdown.
+1. Create a `Resilience` instance, register two health checks and one circuit breaker. Call `Stats()` and verify the output contains both health check statuses and the breaker state.
+2. Use `Execute` to call a function through a breaker that does not yet exist. Verify the breaker is auto-created with default config. Then execute failing calls to open it.
+3. Call `Stop()` and verify all health checkers stop. Attempt to `AddHealthCheck` after `Stop()` and verify the new checker does not start polling.

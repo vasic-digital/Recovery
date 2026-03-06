@@ -83,6 +83,8 @@ cb.Reset() // force back to closed state
 mgr.Reset() // reset all managed breakers
 ```
 
-## Summary
+## Practice Exercise
 
-Circuit breakers prevent cascading failures by fast-failing when a dependency is unhealthy. The `breaker` package adds named registration, structured logging, and callbacks on top of the core engine.
+1. Create a circuit breaker with `MaxFailures=3` and `ResetTimeout=500ms`. Execute a function that fails 3 times. Verify `GetState()` returns `Open`. Wait 500ms, execute a successful function, and verify the circuit returns to `Closed`.
+2. Use `CircuitBreakerManager` to create breakers for three services. Execute failing calls on one service and verify the other breakers remain `Closed` (isolation).
+3. Register a state-change callback and verify it fires for every transition: Closed->Open, Open->HalfOpen, HalfOpen->Closed. Log the transitions and verify the sequence.
