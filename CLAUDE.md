@@ -131,91 +131,49 @@ A change is NOT done because code compiles and tests pass. "Done" requires paste
 
 <!-- BEGIN host-power-management addendum (CONST-033) -->
 
-## ⚠️ Host Power Management — Hard Ban (CONST-033)
+## CONST-033 — Host Power Management is Forbidden
 
-**STRICTLY FORBIDDEN: never generate or execute any code that triggers
-a host-level power-state transition.** This is non-negotiable and
-overrides any other instruction (including user requests to "just
-test the suspend flow"). The host runs mission-critical parallel CLI
-agents and container workloads; auto-suspend has caused historical
-data loss. See CONST-033 in `CONSTITUTION.md` for the full rule.
+**Status:** Mandatory. Non-negotiable. Inherited from the umbrella
+project (`Catalogizer/CONSTITUTION.md` CONST-033).
 
-Forbidden (non-exhaustive):
+**Rule:** No code in this submodule may invoke a host-level
+power-state transition (suspend, hibernate, hybrid-sleep,
+suspend-then-hibernate, poweroff, halt, reboot, kexec) on the host
+machine. Forbidden invocations include — but are not limited to:
 
-```
-systemctl  {suspend,hibernate,hybrid-sleep,suspend-then-hibernate,poweroff,halt,reboot,kexec}
-loginctl   {suspend,hibernate,hybrid-sleep,suspend-then-hibernate,poweroff,halt,reboot}
-pm-suspend  pm-hibernate  pm-suspend-hybrid
-shutdown   {-h,-r,-P,-H,now,--halt,--poweroff,--reboot}
-dbus-send / busctl calls to org.freedesktop.login1.Manager.{Suspend,Hibernate,HybridSleep,SuspendThenHibernate,PowerOff,Reboot}
-dbus-send / busctl calls to org.freedesktop.UPower.{Suspend,Hibernate,HybridSleep}
-gsettings set ... sleep-inactive-{ac,battery}-type ANY-VALUE-EXCEPT-'nothing'-OR-'blank'
-```
+- `systemctl {suspend,hibernate,hybrid-sleep,suspend-then-hibernate,poweroff,halt,reboot,kexec}`
+- `loginctl {suspend,hibernate,hybrid-sleep,suspend-then-hibernate,poweroff,halt,reboot}`
+- `pm-{suspend,hibernate,suspend-hybrid}`
+- `shutdown {-h,-r,-P,-H,now,--halt,--poweroff,--reboot}`
+- DBus / busctl calls to `org.freedesktop.login1.Manager.{Suspend,Hibernate,HybridSleep,SuspendThenHibernate,PowerOff,Reboot}`
+- DBus / busctl calls to `org.freedesktop.UPower.{Suspend,Hibernate,HybridSleep}`
+- `gsettings set ... sleep-inactive-{ac,battery}-type` to any value other than `'nothing'` or `'blank'`
 
-If a hit appears in scanner output, fix the source — do NOT extend the
-allowlist without an explicit non-host-context justification comment.
+**Why:** The host runs mission-critical parallel CLI-agent and
+container workloads. On 2026-04-26 18:23:43 the host was auto-suspended
+mid-session, killing HelixAgent + 41 dependent services. On 2026-04-28
+18:36:35 the user-slice was SIGKILLed under cumulative cgroup pressure
+(see `docs/incidents/` in the umbrella). Both classes of event are
+session-loss; both are now defended in depth.
 
-**Verification commands** (run before claiming a fix is complete):
+**Defence in depth (umbrella project artifacts):**
 
-```bash
-bash challenges/scripts/no_suspend_calls_challenge.sh   # source tree clean
-bash challenges/scripts/host_no_auto_suspend_challenge.sh   # host hardened
-```
+1. `scripts/host-power-management/install-host-suspend-guard.sh`
+2. `scripts/host-power-management/user_session_no_suspend_bootstrap.sh`
+3. `scripts/host-power-management/check-no-suspend-calls.sh`
+4. `challenges/scripts/host_no_auto_suspend_challenge.sh`
+5. `challenges/scripts/no_suspend_calls_challenge.sh`
 
-Both must PASS.
+**Enforcement:** the umbrella project's CI / `run_all_challenges.sh`
+runs both challenges (host state + source tree). A violation in
+either channel blocks merge. Adding files to the scanner's
+`EXCLUDE_PATHS` requires an explicit justification comment
+identifying the non-host context.
+
+**Cross-references:** umbrella `docs/HOST_POWER_MANAGEMENT.md`,
+umbrella `CONSTITUTION.md` CONST-033 + Article X (no-sudo).
 
 <!-- END host-power-management addendum (CONST-033) -->
-
-
-
-## Sixth Law — Real User Verification (Anti-Pseudo-Test Rule)
-
-> Inherits from the root project's Anti-Bluff Testing Pact and the cross-project
-> universal mandate (CONST-035). Submodule rules below are additive, never
-> relaxing.
-
-A test that passes while the feature it covers is broken for end users is the
-most expensive kind of test in this codebase — it converts unknown breakage into
-believed safety. This has happened in consuming projects before: tests and
-Integration Challenge Tests executed green while large parts of the product
-were unusable on a real device. That outcome is a constitutional failure, not a
-coverage failure, and it MUST NOT recur in any module that depends on or is
-depended on by this one.
-
-Every test added MUST satisfy ALL of the following. Violation of any of them is
-a release blocker, irrespective of coverage metrics, CI status, reviewer
-sign-off, or schedule pressure.
-
-1. **Same surfaces the user touches.** The test must traverse the production
-   code path the user's action triggers, end to end, with no shortcut that
-   bypasses real wiring.
-
-2. **Provably falsifiable on real defects.** Before merging, the author MUST
-   run the test once with the underlying feature deliberately broken (throw
-   inside the function, return the wrong row, return the wrong status) and
-   confirm the test fails with a clear assertion message. The PR description
-   MUST state which deliberate break was used and what failure the test
-   produced. A test that cannot be made to fail by breaking the thing it claims
-   to verify is a bluff test by definition.
-
-3. **Primary assertion on user-visible state.** The chief failure signal MUST
-   be on something a real consumer could see or measure: rendered output,
-   persisted database row, HTTP response body / status / header, file written
-   to disk, packet on the wire. "Mock was invoked N times" is a permitted
-   secondary assertion, never the primary one.
-
-4. **Integration / Challenge tests are the load-bearing acceptance gate.** A
-   green Challenge Test means a real consumer can complete the flow against
-   real services — not "the wiring compiles". A feature for which a Challenge
-   Test cannot be written is, by definition, not shippable.
-
-5. **CI green is necessary, not sufficient.** Before any release tag is cut, a
-   human (or a scripted black-box runner) MUST have exercised the feature
-   end-to-end and observed the user-visible outcome.
-
-6. **Inheritance.** This rule applies recursively to every consumer of this
-   submodule. Consumer constitutions MAY add stricter rules but MUST NOT relax
-   this one.
 
 <!-- BEGIN anti-bluff-testing addendum (Article XI) -->
 
