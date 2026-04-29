@@ -237,6 +237,7 @@ func TestStatusConstants(t *testing.T) {
 // TestChecker_ConcurrentSetLogger verifies that SetLogger is safe to call
 // concurrently with status reads.
 func TestChecker_ConcurrentSetLogger(t *testing.T) {
+	// bluff-scan: no-assert-ok (concurrency test — go test -race catches data races; absence of panic == correctness)
 	check := func() error { return nil }
 	c := NewChecker("concurrent-set-logger", check, 50*time.Millisecond)
 

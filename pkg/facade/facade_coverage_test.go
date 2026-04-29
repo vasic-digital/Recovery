@@ -196,6 +196,7 @@ func TestResilience_AddHealthCheck_MultipleReplacements(t *testing.T) {
 // TestResilience_ConcurrentStatsAndExecute verifies that Stats and Execute
 // can be called concurrently without races.
 func TestResilience_ConcurrentStatsAndExecute(t *testing.T) {
+	// bluff-scan: no-assert-ok (concurrency test — go test -race catches data races; absence of panic == correctness)
 	r := New(newTestLogger())
 	defer r.Stop()
 

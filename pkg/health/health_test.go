@@ -153,6 +153,7 @@ func TestChecker_UnhealthyToHealthy(t *testing.T) {
 }
 
 func TestChecker_ConcurrentStatusReads(t *testing.T) {
+	// bluff-scan: no-assert-ok (concurrency test — go test -race catches data races; absence of panic == correctness)
 	check := func() error { return nil }
 	c := NewChecker("concurrent", check, 50*time.Millisecond)
 
