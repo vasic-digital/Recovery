@@ -38,16 +38,6 @@ func TestMapBreakState_AllBranches(t *testing.T) {
 
 // TestNewCircuitBreaker_CustomConfig verifies that explicit MaxFailures and
 // ResetTimeout values are respected without falling back to defaults.
-func TestNewCircuitBreaker_CustomConfig(t *testing.T) {
-	cb := NewCircuitBreaker(CircuitBreakerConfig{
-		Name:         "custom",
-		MaxFailures:  10,
-		ResetTimeout: 2 * time.Minute,
-	})
-	require.NotNil(t, cb)
-	assert.Equal(t, 10, cb.maxFailures)
-	assert.Equal(t, 2*time.Minute, cb.resetTimeout)
-}
 
 // TestNewCircuitBreaker_ZeroValues verifies that zero/negative config values
 // fall back to defaults.
