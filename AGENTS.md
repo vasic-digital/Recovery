@@ -1,5 +1,9 @@
 # AGENTS.md - Recovery Module Multi-Agent Coordination Guide
 
+## INHERITED FROM constitution/AGENTS.md
+
+All rules in `constitution/AGENTS.md` (and the `constitution/Constitution.md` it references) apply unconditionally. This file's rules below extend them — they MUST NOT weaken any inherited rule. See parent root `CLAUDE.md` §6.AD for the Lava-specific incorporation context (29th §6.L cycle, 2026-05-14) and §6.AD-debt for the implementation-gap inventory. Use `constitution/find_constitution.sh` from the parent project root to resolve the absolute path of the submodule from any nested location.
+
 ## Overview
 
 This document provides guidance for AI agents (Claude Code, Copilot, Cursor, etc.) working on the `digital.vasic.recovery` module. It defines responsibilities, boundaries, and coordination protocols to prevent conflicts when multiple agents operate concurrently.
